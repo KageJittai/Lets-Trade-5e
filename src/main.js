@@ -1,6 +1,7 @@
 import ItemWindow from "./item-window.js"
+import TradeWindow from "./trade-window.js"
 import {Config} from "./config.js"
-import {receiveTrade, completeTrade, denyTrade} from "./lets-trade-core.js"
+import {getPlayerCharacters,receiveTrade, completeTrade, denyTrade} from "./lets-trade-core.js"
 import {getCompatibility} from "./compatibility.js"
 import { openItemTrade } from "./openItemTrade.js"
 import { openCurrencyTrade } from "./openCurrencyTrade.js"
@@ -26,6 +27,12 @@ Hooks.once("setup", async function () {
            });
     } else if (game.system.id === "a5e") {
         Hooks.on("getActorSheetHeaderButtons", renderHeaderButton);
+
+    } else if (game.system.id === "TheWitcherTRPG") {
+        await Hooks.on("getActorSheetHeaderButtons", renderHeaderButton);
+    }
+    else{
+      console.error("Let's trade unknown system:",game.system.id)
     }
 
     game.socket.on(Config.Socket, packet => {
@@ -75,15 +82,22 @@ async function renderInjectionHook(sheet, element, character) {
     }
 }
 
-function renderHeaderButton(sheet, headers) {
+async function renderHeaderButton(sheet, headers) {
     console.log("Let's Trade 5e | Header Button Render");
     if (sheet.actor.isOwner) {
         headers.unshift({
             label: "LetsTrade5E.TradeButton",
             class: "trade-button",
             icon: "fas fa-balance-scale-right",
-            onclick: onHeaderClick.bind({actorId: sheet.actor.id})
+            onclick: onHeaderClick.bind({actorId: sheet.actor.id,money:false})
         });
+        headers.unshift({
+           label: "LetsTrade5E.TradeButton",
+           class: "trade-button-money",
+           icon: "fas fa-coins",
+           onclick: onHeaderClick.bind({actorId: sheet.actor.id,money:true})
+        });
+
     }
 }
 
@@ -110,17 +124,38 @@ function onCurrencyTradeClick(event) {
 
 function onHeaderClick(event) {
     console.log("Let's Trade 5e | Opening item sheet trade dialog for " + this.actorId);
-
     const actor = game.actors.get(this.actorId);
-    const items = actor.items.filter(item => item.type === "object");
+    var items_filtered;
+    if (game.system.id === "TheWitcherTRPG") {
+      let itemTypes = ["weapon","armor","component","valuable","alchemical"]
+      items_filtered = actor.items.filter(item => itemTypes.includes(item.type));
+    }
+    else {
+      items_filtered = actor.items.filter(item => item.type === "object");
+    }
 
-    const itemWindow = new ItemWindow({
-        items,
-        actorId: this.actorId
-    });
-    itemWindow.render(true);
+    if (this.money) {
+      const actor = game.actors.get(this.actorId);
+      const currency = game.actors.get(this.actorId).system.currency
+      const characters = getPlayerCharacters(this.actorId);
+      console.log(currency);
+      const tw = new TradeWindow({
+        actorId: this.actorId,
+        currencyMax: currency,
+        characters
+      });
+      tw.render(true);
+    }
+    else {
+      const items = items_filtered;
+      console.log(items)
+      const itemWindow = new ItemWindow({
+          items,
+          actorId: this.actorId
+      });
+      itemWindow.render(true);
+    }
 }
-
 /**
  * Initialization helper, to set API.
  * @param api to set to game module.

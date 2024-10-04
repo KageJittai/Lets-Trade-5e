@@ -5,7 +5,7 @@
     "LetsTrade5E.TradeAccepted": "{name} a accepté votre demande de transaction.",
     "LetsTrade5E.TradeRejected": "{name} a rejeté votre demande de transaction.",
     "LetsTrade5E.TradeIncomingTitle": "Offre de transaction recue",
-    "LetsTrade5E.TradeDescription": "{name} vous envoie {item}. L'acceptez vous ?",
+    "LetsTrade5E.TradeDescription": "{name} vous envoie {item}. L'acceptez-vous ?",
     "LetsTrade5E.TradeDescriptionGM": "{sender} a envoyer {item} a {receiver}",
     "LetsTrade5E.TradeConfirm": "Confirmer",
     "LetsTrade5E.TradeDeny": "Refuser",

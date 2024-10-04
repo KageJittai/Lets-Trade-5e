@@ -130,13 +130,13 @@ function onHeaderClick(event) {
       let itemTypes = ["weapon","armor","component","valuable","alchemical"]
       items_filtered = actor.items.filter(item => itemTypes.includes(item.type));
     }
-    else{
+    else {
       items_filtered = actor.items.filter(item => item.type === "object");
     }
 
-    if (this.money){
+    if (this.money) {
       const actor = game.actors.get(this.actorId);
-      const currency   = game.actors.get(this.actorId).system.currency
+      const currency = game.actors.get(this.actorId).system.currency
       const characters = getPlayerCharacters(this.actorId);
       console.log(currency);
       const tw = new TradeWindow({
@@ -146,7 +146,7 @@ function onHeaderClick(event) {
       });
       tw.render(true);
     }
-    else{
+    else {
       const items = items_filtered;
       console.log(items)
       const itemWindow = new ItemWindow({
